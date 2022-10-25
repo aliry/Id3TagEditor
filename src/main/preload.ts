@@ -20,4 +20,8 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
   },
+  fs: {
+    readdir: async (folderPath: string) =>
+      ipcRenderer.invoke('readdir', folderPath),
+  },
 });

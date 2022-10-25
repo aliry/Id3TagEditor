@@ -42,19 +42,20 @@ const MainContainer = () => {
     }
     const aFile = e.target.files[0];
     currentFolder.current = aFile.path.replace(aFile.name, '');
-    let files = await window.electron.fs.readdir(currentFolder.current);
-    files = files.filter((f) => f.endsWith(FileExtension));
+    const files = await window.electron.fs.readdir(currentFolder.current);
     const newRowData: IRowData[] = [];
     for (let i = 0; i < files.length; i += 1) {
-      const fileName = files[i].replace(FileExtension, '');
-      const { title, artist, album } = extractTagsFromFileName(fileName);
-      newRowData.push({
-        fileName,
-        title,
-        artist,
-        album,
-        genre: '',
-      });
+      if (files[i].endsWith(FileExtension)) {
+        const fileName = files[i].replace(FileExtension, '');
+        const { title, artist, album } = extractTagsFromFileName(fileName);
+        newRowData.push({
+          fileName,
+          title,
+          artist,
+          album,
+          genre: '',
+        });
+      }
     }
 
     setRowData(newRowData);

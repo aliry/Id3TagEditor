@@ -103,10 +103,12 @@
     "@emotion/styled": "^11.10.4",
     "@mui/material": "^5.10.10",
     "ag-grid-community": "^28.2.0",
+    "ag-grid-enterprise": "^28.2.0",
     "ag-grid-react": "^28.2.0",
     "electron-debug": "^3.2.0",
     "electron-log": "^4.4.8",
     "electron-updater": "^5.2.3",
+    "node-id3": "^0.2.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0"

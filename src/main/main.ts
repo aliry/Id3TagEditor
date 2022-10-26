@@ -13,6 +13,7 @@ import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import * as fs from 'fs';
+import * as id3 from 'node-id3';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -32,10 +33,23 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
-ipcMain.handle('readdir', async (event, folderPath) => {
+ipcMain.handle('fs_readdir', async (event, folderPath: string) => {
   const files = await fs.promises.readdir(folderPath);
   return files;
 });
+
+ipcMain.handle('id3_readTags', async (event, filePath: string) => {
+  const tags = await id3.Promise.read(filePath);
+  return tags;
+});
+
+ipcMain.handle(
+  'id3_updateTags',
+  async (event, filePath: string, tags: id3.Tags) => {
+    const updatedTags = await id3.Promise.update(tags, filePath);
+    return updatedTags;
+  }
+);
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');

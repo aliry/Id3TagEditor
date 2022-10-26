@@ -1,9 +1,11 @@
+/* eslint-disable no-restricted-syntax */
 import { useState, useRef, ChangeEvent } from 'react';
 import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-enterprise';
 import { ColDef } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css'; // Core grid CSS, always needed
 import 'ag-grid-community/styles/ag-theme-alpine.css'; // Optional theme CSS
-import { Paper } from '@mui/material';
+import { Paper, Button, ButtonGroup } from '@mui/material';
 
 const FileExtension = '.mp3';
 
@@ -17,9 +19,9 @@ interface IRowData {
 
 const MainContainer = () => {
   const currentFolder = useRef('');
+  const folderSectorInputRef = useRef<HTMLInputElement>(null);
   const [rowData, setRowData] = useState<IRowData[]>([]);
 
-  // Each Column Definition results in one Column.
   const [columnDefs] = useState<ColDef<IRowData>[]>([
     { field: 'fileName', flex: 2 },
     { field: 'title', editable: true, flex: 2 },
@@ -36,6 +38,18 @@ const MainContainer = () => {
     return { title, artist, album };
   };
 
+  const getFileTags = async (fileName: string): Promise<IRowData> => {
+    const filePath = `${currentFolder.current}${fileName}`;
+    const tags = await window.electron.id3.readTags(filePath);
+    return {
+      fileName,
+      title: tags.title ?? '',
+      artist: tags.artist ?? '',
+      album: tags.album ?? '',
+      genre: tags.genre ?? '',
+    };
+  };
+
   const onFolderSelect = async (e: ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
       return;
@@ -43,28 +57,53 @@ const MainContainer = () => {
     const aFile = e.target.files[0];
     currentFolder.current = aFile.path.replace(aFile.name, '');
     const files = await window.electron.fs.readdir(currentFolder.current);
-    const newRowData: IRowData[] = [];
+
+    const tagPromises: Promise<IRowData>[] = [];
     for (let i = 0; i < files.length; i += 1) {
       if (files[i].endsWith(FileExtension)) {
-        const fileName = files[i].replace(FileExtension, '');
-        const { title, artist, album } = extractTagsFromFileName(fileName);
-        newRowData.push({
-          fileName,
-          title,
-          artist,
-          album,
-          genre: '',
-        });
+        tagPromises.push(getFileTags(files[i]));
       }
     }
 
+    const newRowData: IRowData[] = await Promise.all(tagPromises);
     setRowData(newRowData);
+    e.target.value = '';
+  };
+
+  const onGenerateTags = () => {
+    const newRowData: IRowData[] = [];
+    for (const row of rowData) {
+      const { title, artist, album } = extractTagsFromFileName(row.fileName);
+      newRowData.push({
+        fileName: row.fileName,
+        title,
+        artist,
+        album,
+        genre: '',
+      });
+    }
   };
 
   return (
     <div style={{}}>
       <Paper style={{ padding: 10 }}>
-        <input webkitdirectory="" type="file" onChange={onFolderSelect} />
+        <input
+          webkitdirectory=""
+          type="file"
+          onChange={onFolderSelect}
+          ref={folderSectorInputRef}
+          style={{ display: 'none' }}
+        />
+        <ButtonGroup variant="text">
+          <Button onClick={() => folderSectorInputRef.current?.click()}>
+            Load Files
+          </Button>
+          <Button onClick={() => onGenerateTags}>
+            Generate Tags from File Names
+          </Button>
+          <Button>Save Tags</Button>
+          <Button onClick={() => setRowData([])}>Reset</Button>
+        </ButtonGroup>
       </Paper>
       <Paper
         className="ag-theme-alpine"
@@ -77,8 +116,10 @@ const MainContainer = () => {
             sortable: true,
             resizable: true,
           }}
-          enableRangeHandle
           enableRangeSelection
+          enableFillHandle
+          undoRedoCellEditing
+          undoRedoCellEditingLimit={20}
           onGridReady={(params) => {
             params.api.sizeColumnsToFit();
           }}

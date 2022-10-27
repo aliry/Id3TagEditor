@@ -28,7 +28,7 @@ contextBridge.exposeInMainWorld('electron', {
   id3: {
     readTags: async (filePath: string) =>
       ipcRenderer.invoke('id3_readTags', filePath),
-    update: async (filePath: string, tags: id3.Tags) =>
+    updateTags: async (filePath: string, tags: id3.Tags) =>
       ipcRenderer.invoke('id3_updateTags', filePath, tags),
   },
 });

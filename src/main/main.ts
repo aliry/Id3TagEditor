@@ -27,27 +27,18 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
-
 ipcMain.handle('fs_readdir', async (event, folderPath: string) => {
-  const files = await fs.promises.readdir(folderPath);
-  return files;
+  return fs.promises.readdir(folderPath);
 });
 
 ipcMain.handle('id3_readTags', async (event, filePath: string) => {
-  const tags = await id3.Promise.read(filePath);
-  return tags;
+  return id3.Promise.read(filePath);
 });
 
 ipcMain.handle(
   'id3_updateTags',
   async (event, filePath: string, tags: id3.Tags) => {
-    const updatedTags = await id3.Promise.update(tags, filePath);
-    return updatedTags;
+    return id3.Promise.update(tags, filePath);
   }
 );
 

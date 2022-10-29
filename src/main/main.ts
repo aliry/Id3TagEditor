@@ -8,14 +8,14 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import * as path from 'path';
+import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import * as fs from 'fs';
-import * as id3 from 'node-id3';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+
+require('./ipcHandler');
 
 class AppUpdater {
   constructor() {
@@ -26,21 +26,6 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.handle('fs_readdir', async (event, folderPath: string) => {
-  return fs.promises.readdir(folderPath);
-});
-
-ipcMain.handle('id3_readTags', async (event, filePath: string) => {
-  return id3.Promise.read(filePath);
-});
-
-ipcMain.handle(
-  'id3_updateTags',
-  async (event, filePath: string, tags: id3.Tags) => {
-    return id3.Promise.update(tags, filePath);
-  }
-);
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');

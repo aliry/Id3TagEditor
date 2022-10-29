@@ -1,4 +1,4 @@
-import FileExtension from '../constants';
+import { FileExtension } from '../constants';
 import { IRowData } from '../types/types';
 
 export default class TagService {
@@ -25,7 +25,10 @@ export default class TagService {
     return { title, artist, album };
   }
 
-  public static async SaveTags(rowData: IRowData[], folderPath: string) {
+  public static async SaveTags(
+    rowData: IRowData[],
+    folderPath: string
+  ): Promise<boolean> {
     const promises: Promise<boolean>[] = [];
     for (let idx = 0; idx < rowData.length; idx += 1) {
       const row = rowData[idx];
@@ -36,9 +39,11 @@ export default class TagService {
         album: row.album,
         genre: row.genre,
       };
+
       promises.push(window.electron.id3.updateTags(filePath, tags));
     }
-    await Promise.all(promises);
+    const results = await Promise.all(promises);
+    return results.every((result) => result);
   }
 
   public static GenerateTags(rowData: IRowData[]): IRowData[] {

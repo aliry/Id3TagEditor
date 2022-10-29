@@ -1,24 +1,33 @@
 import { Alert, Snackbar } from '@mui/material';
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
-import { errorMessageAtom } from 'state/atoms';
+import { messageAtom } from 'state/atoms';
 
 const MessageBar = () => {
-  const [errorMessage] = useAtom(errorMessageAtom);
+  const [message, setMessage] = useAtom(messageAtom);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (errorMessage) setOpen(true);
-  }, [errorMessage]);
+    if (message) setOpen(true);
+  }, [message]);
 
   const handleClose = () => {
     setOpen(false);
+    setMessage(null);
   };
 
   return (
-    <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
-      <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-        {errorMessage}
+    <Snackbar
+      open={open}
+      autoHideDuration={message?.type === 'error' ? null : 6000}
+      onClose={handleClose}
+    >
+      <Alert
+        onClose={handleClose}
+        severity={message?.type}
+        sx={{ width: '100%' }}
+      >
+        {message?.message}
       </Alert>
     </Snackbar>
   );

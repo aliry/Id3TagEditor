@@ -2,7 +2,7 @@ import { ColDef } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-enterprise';
 import 'ag-grid-community/styles/ag-grid.css'; // Core grid CSS, always needed
-import 'ag-grid-community/styles/ag-theme-alpine.css'; // Optional theme CSS
+import 'ag-grid-community/styles/ag-theme-material.css'; // Optional theme CSS
 import { useState } from 'react';
 import { Paper } from '@mui/material';
 import { IRowData } from '../../types/types';
@@ -23,7 +23,7 @@ const GridContainer = (props: IGridContainerProps) => {
 
   return (
     <Paper
-      className="ag-theme-alpine"
+      className="ag-theme-material"
       style={{ height: 'calc(100vh - 100px)' }}
     >
       <AgGridReact<IRowData>

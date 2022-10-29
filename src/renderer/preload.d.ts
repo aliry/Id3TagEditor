@@ -1,4 +1,3 @@
-import { Channels } from 'main/preload';
 import * as id3 from 'node-id3';
 
 declare global {

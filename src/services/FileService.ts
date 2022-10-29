@@ -1,4 +1,4 @@
-import FileExtension from '../constants';
+import { FileExtension } from '../constants';
 import TagService from './TagService';
 import { IRowData } from '../types/types';
 

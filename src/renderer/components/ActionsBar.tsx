@@ -17,7 +17,7 @@ const ActionsBar = () => {
   const [rowData, setRowData] = useAtom(rowDataAtom);
   const [, setIsLoading] = useAtom(isLoadingAtom);
   const [, setMessage] = useAtom(messageAtom);
-  const onGenerateTags = () => TagService.GenerateTags(rowData);
+  const onGenerateTags = () => setRowData(TagService.GenerateTags(rowData));
 
   async function runFuncAsync<T>(
     func: (...a: any) => Promise<T>,
@@ -70,6 +70,7 @@ const ActionsBar = () => {
       });
     }
   };
+
   return (
     <Paper style={{ padding: 10 }}>
       <input

@@ -14,11 +14,11 @@ export interface IGridContainerProps {
 const GridContainer = (props: IGridContainerProps) => {
   const { rowData } = props;
   const [columnDefs] = useState<ColDef<IRowData>[]>([
-    { field: 'fileName', flex: 2 },
-    { field: 'title', editable: true, flex: 2 },
-    { field: 'artist', editable: true, flex: 1 },
-    { field: 'album', editable: true, flex: 1 },
-    { field: 'genre', editable: true, flex: 0.5 },
+    { field: 'fileName', width: 200, flex: 2 },
+    { field: 'title', editable: true, width: 100, flex: 1 },
+    { field: 'artist', editable: true, width: 100, flex: 1 },
+    { field: 'album', editable: true, width: 100, flex: 1 },
+    { field: 'genre', editable: true, width: 75, flex: 0.5 },
   ]);
 
   return (

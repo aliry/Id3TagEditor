@@ -55,10 +55,10 @@ export default class TagService {
       );
       newRowData.push({
         fileName: row.fileName,
-        title,
-        artist,
-        album,
-        genre: '',
+        title: row.title || title,
+        artist: row.artist || artist,
+        album: row.album || album,
+        genre: row.genre || '',
       });
     }
     return newRowData;

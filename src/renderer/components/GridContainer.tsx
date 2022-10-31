@@ -1,6 +1,6 @@
 import { ColDef } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-enterprise';
+// import 'ag-grid-enterprise'; // Can be used to enable enterprise features like fill handle and copy/paste. Need enterprise license.
 import 'ag-grid-community/styles/ag-grid.css'; // Core grid CSS, always needed
 import 'ag-grid-community/styles/ag-theme-material.css'; // Optional theme CSS
 import { useState } from 'react';

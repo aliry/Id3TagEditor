@@ -111,6 +111,12 @@ const createWindow = async () => {
 /**
  * Add event listeners...
  */
+app.setAboutPanelOptions({
+  applicationName: 'Music Tag Editor',
+  applicationVersion: '0.0.2',
+  version: '0.0.2',
+  iconPath: path.join(__dirname, '../../assets/icon.png'),
+});
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even

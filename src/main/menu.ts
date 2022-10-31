@@ -54,14 +54,12 @@ export default class MenuBuilder {
 
   buildDarwinTemplate(): MenuItemConstructorOptions[] {
     const subMenuAbout: DarwinMenuItemConstructorOptions = {
-      label: 'Electron',
+      label: 'Music Tag Editor',
       submenu: [
         {
           label: 'About Music Tag Editor',
           selector: 'orderFrontStandardAboutPanel:',
         },
-        { type: 'separator' },
-        { label: 'Services', submenu: [] },
         { type: 'separator' },
         {
           label: 'Hide Music Tag Editor',
@@ -157,27 +155,13 @@ export default class MenuBuilder {
         {
           label: 'Learn More',
           click() {
-            shell.openExternal('https://electronjs.org');
-          },
-        },
-        {
-          label: 'Documentation',
-          click() {
-            shell.openExternal(
-              'https://github.com/electron/electron/tree/main/docs#readme'
-            );
-          },
-        },
-        {
-          label: 'Community Discussions',
-          click() {
-            shell.openExternal('https://www.electronjs.org/community');
+            shell.openExternal('https://github.com/aliry/Id3TagEditor');
           },
         },
         {
           label: 'Search Issues',
           click() {
-            shell.openExternal('https://github.com/electron/electron/issues');
+            shell.openExternal('https://github.com/aliry/Id3TagEditor/issues');
           },
         },
       ],
@@ -258,27 +242,15 @@ export default class MenuBuilder {
           {
             label: 'Learn More',
             click() {
-              shell.openExternal('https://electronjs.org');
-            },
-          },
-          {
-            label: 'Documentation',
-            click() {
-              shell.openExternal(
-                'https://github.com/electron/electron/tree/main/docs#readme'
-              );
-            },
-          },
-          {
-            label: 'Community Discussions',
-            click() {
-              shell.openExternal('https://www.electronjs.org/community');
+              shell.openExternal('https://github.com/aliry/Id3TagEditor');
             },
           },
           {
             label: 'Search Issues',
             click() {
-              shell.openExternal('https://github.com/electron/electron/issues');
+              shell.openExternal(
+                'https://github.com/aliry/Id3TagEditor/issues'
+              );
             },
           },
         ],

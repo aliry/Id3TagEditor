@@ -7,6 +7,7 @@ export const IpcChannels = {
 export const IpcInvoke = {
   fs: {
     readdir: 'fs_readdir',
+    rename: 'fs_rename',
   },
   id3: {
     readTags: 'id3_readTags',

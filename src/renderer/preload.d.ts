@@ -5,10 +5,19 @@ declare global {
     electron: {
       fs: {
         readdir(folderPath: string): Promise<string[]>;
+        rename(
+          folderPath: string,
+          oldFileName: string,
+          newFileName: string
+        ): Promise<boolean>;
       };
       id3: {
-        readTags(filePath: string): Promise<id3.Tags>;
-        updateTags(filePath: string, tags: id3.Tags): Promise<boolean>;
+        readTags(folderPath: string, fileName: string): Promise<id3.Tags>;
+        updateTags(
+          folderPath: string,
+          fileName: string,
+          tags: id3.Tags
+        ): Promise<boolean>;
       };
     };
   }

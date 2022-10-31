@@ -5,16 +5,14 @@ import 'ag-grid-community/styles/ag-grid.css'; // Core grid CSS, always needed
 import 'ag-grid-community/styles/ag-theme-material.css'; // Optional theme CSS
 import { useState } from 'react';
 import { Paper } from '@mui/material';
+import { useAtom } from 'jotai';
+import { rowDataAtom } from 'state/atoms';
 import { IRowData } from '../../types/types';
 
-export interface IGridContainerProps {
-  rowData: IRowData[];
-}
-
-const GridContainer = (props: IGridContainerProps) => {
-  const { rowData } = props;
+const GridContainer = () => {
+  const [rowData] = useAtom(rowDataAtom);
   const [columnDefs] = useState<ColDef<IRowData>[]>([
-    { field: 'fileName', width: 200, flex: 2 },
+    { field: 'fileName', editable: true, width: 200, flex: 2 },
     { field: 'title', editable: true, width: 100, flex: 1 },
     { field: 'artist', editable: true, width: 100, flex: 1 },
     { field: 'album', editable: true, width: 100, flex: 1 },

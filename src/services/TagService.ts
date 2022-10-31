@@ -3,12 +3,12 @@ import { IRowData } from '../types/types';
 
 export default class TagService {
   public static async GetFileTags(
-    fileName: string,
-    folderPath: string
+    folderPath: string,
+    fileName: string
   ): Promise<IRowData> {
-    const filePath = `${folderPath}${fileName}`;
-    const tags = await window.electron.id3.readTags(filePath);
+    const tags = await window.electron.id3.readTags(folderPath, fileName);
     return {
+      fileNameOnDisk: fileName,
       fileName: fileName.replace(FileExtension, ''),
       title: tags.title ?? '',
       artist: tags.artist ?? '',
@@ -26,24 +26,23 @@ export default class TagService {
   }
 
   public static async SaveTags(
-    rowData: IRowData[],
-    folderPath: string
-  ): Promise<boolean> {
-    const promises: Promise<boolean>[] = [];
-    for (let idx = 0; idx < rowData.length; idx += 1) {
-      const row = rowData[idx];
-      const filePath = `${folderPath}${row.fileName}${FileExtension}`;
-      const tags = {
-        title: row.title,
-        artist: row.artist,
-        album: row.album,
-        genre: row.genre,
-      };
-
-      promises.push(window.electron.id3.updateTags(filePath, tags));
+    folderPath: string,
+    rowData: IRowData
+  ): Promise<void> {
+    const tags = {
+      title: rowData.title,
+      artist: rowData.artist,
+      album: rowData.album,
+      genre: rowData.genre,
+    };
+    const result = await window.electron.id3.updateTags(
+      folderPath,
+      rowData.fileNameOnDisk,
+      tags
+    );
+    if (!result) {
+      throw new Error('Failed to save tags');
     }
-    const results = await Promise.all(promises);
-    return results.every((result) => result);
   }
 
   public static GenerateTags(rowData: IRowData[]): IRowData[] {
@@ -54,11 +53,29 @@ export default class TagService {
         row.fileName
       );
       newRowData.push({
+        fileNameOnDisk: row.fileNameOnDisk,
         fileName: row.fileName,
         title: row.title || title,
         artist: row.artist || artist,
         album: row.album || album,
         genre: row.genre || '',
+      });
+    }
+    return newRowData;
+  }
+
+  public static GenerateFileNames(rowData: IRowData[]): IRowData[] {
+    const newRowData: IRowData[] = [];
+    for (let idx = 0; idx < rowData.length; idx += 1) {
+      const row = rowData[idx];
+      const fileName = `${row.title} - ${row.artist}`;
+      newRowData.push({
+        fileNameOnDisk: row.fileNameOnDisk,
+        fileName,
+        title: row.title,
+        artist: row.artist,
+        album: row.album,
+        genre: row.genre,
       });
     }
     return newRowData;

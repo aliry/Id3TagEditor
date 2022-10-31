@@ -9,7 +9,9 @@ import {
   isLoadingAtom,
   rowDataAtom,
 } from 'state/atoms';
+import { IRowData } from 'types/types';
 import GetErrorMessage from 'utils/utils';
+import { FileExtension } from '../../constants';
 
 const ActionsBar = () => {
   const folderSectorInputRef = useRef<HTMLInputElement>(null);
@@ -18,29 +20,21 @@ const ActionsBar = () => {
   const [, setIsLoading] = useAtom(isLoadingAtom);
   const [, setMessage] = useAtom(messageAtom);
   const onGenerateTags = () => setRowData(TagService.GenerateTags(rowData));
+  const onGenerateFileNames = () =>
+    setRowData(TagService.GenerateFileNames(rowData));
 
-  async function runFuncAsync<T>(
-    func: (...a: any) => Promise<T>,
-    ...args: unknown[]
-  ): Promise<Awaited<T> | null> {
-    let result = null;
+  const onFolderSelect = async (folderPath: string) => {
+    setIsLoading(true);
+    setCurrentFolder(folderPath);
     try {
-      setIsLoading(true);
-      result = await func(...args);
+      const data = await FileService.GetFilesInfo(folderPath);
+      if (data) {
+        setRowData(data);
+      }
     } catch (error: unknown) {
       setMessage({ message: GetErrorMessage(error), type: 'error' });
     }
-
     setIsLoading(false);
-    return result;
-  }
-
-  const onFolderSelect = async (folderPath: string) => {
-    setCurrentFolder(folderPath);
-    const data = await runFuncAsync(FileService.GetFilesInfo, folderPath);
-    if (data) {
-      setRowData(data);
-    }
   };
 
   const onInputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,20 +47,52 @@ const ActionsBar = () => {
   };
 
   const onSaveTags = async () => {
-    const result = await runFuncAsync(
-      TagService.SaveTags,
-      rowData,
-      currentFolder
+    const renameFileNamesWithError = [];
+    const tagUpdateFileNamesWithError = [];
+    const newRowData: IRowData[] = [];
+
+    setIsLoading(true);
+    await Promise.all(
+      rowData.map(async (row) => {
+        const newRow = { ...row };
+        const newFileName = `${row.fileName}${FileExtension}`;
+        if (row.fileNameOnDisk !== newFileName) {
+          try {
+            await FileService.RenameFile(
+              currentFolder,
+              row.fileNameOnDisk,
+              newFileName
+            );
+            newRow.fileNameOnDisk = newFileName;
+          } catch (error: unknown) {
+            renameFileNamesWithError.push(row.fileNameOnDisk);
+          }
+        }
+        try {
+          await TagService.SaveTags(currentFolder, newRow);
+        } catch (error: unknown) {
+          tagUpdateFileNamesWithError.push(newRow.fileNameOnDisk);
+        }
+
+        newRowData.push(newRow);
+      })
     );
-    if (!result) {
+
+    setRowData(newRowData);
+    setIsLoading(false);
+
+    if (
+      renameFileNamesWithError.length === 0 &&
+      tagUpdateFileNamesWithError.length === 0
+    ) {
       setMessage({
-        message: 'An error occurred while saving tags!',
-        type: 'error',
+        message: 'All files saved successfully!',
+        type: 'success',
       });
     } else {
       setMessage({
-        message: 'Tags saved successfully!',
-        type: 'success',
+        message: 'An error occurred while saving!',
+        type: 'error',
       });
     }
   };
@@ -84,8 +110,9 @@ const ActionsBar = () => {
         <Button onClick={() => folderSectorInputRef.current?.click()}>
           Load Files
         </Button>
-        <Button onClick={onGenerateTags}>Generate Tags from File Names</Button>
-        <Button onClick={onSaveTags}>Save Tags</Button>
+        <Button onClick={onGenerateTags}>Auto Generate Tags</Button>
+        <Button onClick={onGenerateFileNames}>Auto Generate Filenames</Button>
+        <Button onClick={onSaveTags}>Save All</Button>
         <Button onClick={() => setRowData([])}>Clear All</Button>
       </ButtonGroup>
     </Paper>

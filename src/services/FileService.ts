@@ -9,12 +9,27 @@ class FileService {
     const tagPromises: Promise<IRowData>[] = [];
     for (let i = 0; i < files.length; i += 1) {
       if (files[i].endsWith(FileExtension)) {
-        tagPromises.push(TagService.GetFileTags(files[i], folderPath));
+        tagPromises.push(TagService.GetFileTags(folderPath, files[i]));
       }
     }
 
     const newRowData: IRowData[] = await Promise.all(tagPromises);
     return newRowData;
+  }
+
+  public static async RenameFile(
+    folderPath: string,
+    oldFileName: string,
+    newFileName: string
+  ): Promise<void> {
+    const result = await window.electron.fs.rename(
+      folderPath,
+      oldFileName,
+      newFileName
+    );
+    if (!result) {
+      throw new Error('Failed to rename file');
+    }
   }
 }
 
